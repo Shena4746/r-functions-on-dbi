@@ -11,3 +11,5 @@ Some user-defined functions that are often useful to handle remote tables in Pos
   - Drop a view
 - Misc
   - Free resources
+
+Read in GitBook: <https://shena4746.github.io/r-functions-on-dbi/>
