@@ -1,0 +1,39 @@
+```{r knit-setting-for-misc, eval = TRUE, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE, collapse = TRUE)
+```
+
+# Misc
+
+## Free resources {#discard}
+
+- Executes a `DISCARD` SQL statement.
+- Returns `TRUE` invisibly even if it does nothing.
+- The arguments `all = FALSE`, `plans = TRUE` and `temporary = TRUE` specify which of the corresponding SQL statement option should be applied. If multiple options are selected, only the most dominant one will be executed. If none is selected, nothing will be done.
+
+### Definition
+
+```{r def-discard-function-show, ref.label='def-discard-function'}
+```
+
+### Example
+
+`DISCARD TEMPORARY` removes tempoary views at once, intead of listing and dropping them, as we did in \@ref(drop).
+
+```{r discard-temprary-view}
+# prepare temporary and non-temporary views
+sql <- "SELECT * FROM mtcars LIMIT 10"
+for (i in 1:4) {
+    dbCreateView(con, sql, paste("view", i, sep = ""), temporary = isTRUE(i <= 2))
+}
+
+con %>% dbListViews()
+con %>% dbDiscard(temporary = TRUE) # delte all temporary objects
+con %>% dbListViews() # non-temporary views are stil alive
+```
+
+```{r clean-non-discarded-views, include=FALSE}
+con %>%
+    dbListViews() %>%
+    purrr::map_int(~ dbDropView(con, .x)) %>%
+    sum()
+```
