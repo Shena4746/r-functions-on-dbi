@@ -1,6 +1,6 @@
 # About
 
-Some user-defined functions that are often useful to handle remote tables in Postgres with R. All of these functions heavily depends on DBI and RPostgres packages, behave similarly to those in those packages, and assume some familiarity with them.
+Some user-defined functions that are often useful to handle remote tables in Postgres with R. All of these functions heavily depends on DBI and RPostgres packages, behave similarly to those functions in these packages, and assume some familiarity with them.
 
 # Contents
 
