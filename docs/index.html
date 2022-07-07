@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Code Examples for DBI and RPostgres</title>
-  <meta name="description" content="Code Examples for DBI and RPostgres" />
+  <title>Supplementary functions for DBI + RPostgres</title>
+  <meta name="description" content="Supplementary functions for DBI + RPostgres" />
   <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Code Examples for DBI and RPostgres" />
+  <meta property="og:title" content="Supplementary functions for DBI + RPostgres" />
   <meta property="og:type" content="book" />
   
   
-  <meta name="github-repo" content="Shena4746/datascience-100knocks-preprocess-R" />
+  <meta name="github-repo" content="https://github.com/Shena4746/r-functions-on-dbi" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Code Examples for DBI and RPostgres" />
+  <meta name="twitter:title" content="Supplementary functions for DBI + RPostgres" />
   
   
   
@@ -23,7 +23,7 @@
 <meta name="author" content="Shena" />
 
 
-<meta name="date" content="2022-07-07" />
+<meta name="date" content="2022-07-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -145,7 +145,7 @@ code span.wa { color: #da4453; } /* Warning */
 <li class="chapter" data-level="3.2.1" data-path=""><a href="#definition-2"><i class="fa fa-check"></i><b>3.2.1</b> Definition</a></li>
 <li class="chapter" data-level="3.2.2" data-path=""><a href="#example-2"><i class="fa fa-check"></i><b>3.2.2</b> Example</a></li>
 </ul></li>
-<li class="chapter" data-level="3.3" data-path=""><a href="#test-existance-of-a-view"><i class="fa fa-check"></i><b>3.3</b> Test existance of a view</a><ul>
+<li class="chapter" data-level="3.3" data-path=""><a href="#test-existence-of-a-view"><i class="fa fa-check"></i><b>3.3</b> Test existence of a view</a><ul>
 <li class="chapter" data-level="3.3.1" data-path=""><a href="#definition-3"><i class="fa fa-check"></i><b>3.3.1</b> Definition</a></li>
 <li class="chapter" data-level="3.3.2" data-path=""><a href="#example-3"><i class="fa fa-check"></i><b>3.3.2</b> Example</a></li>
 </ul></li>
@@ -169,7 +169,7 @@ code span.wa { color: #da4453; } /* Warning */
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Code Examples for DBI and RPostgres</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Supplementary functions for DBI + RPostgres</a>
           </h1>
         </div>
 
@@ -178,9 +178,9 @@ code span.wa { color: #da4453; } /* Warning */
 
             <section class="normal" id="section-">
 <div id="header">
-<h1 class="title">Code Examples for DBI and RPostgres</h1>
+<h1 class="title">Supplementary functions for DBI + RPostgres</h1>
 <p class="author"><em>Shena</em></p>
-<p class="date"><em>2022-07-07</em></p>
+<p class="date"><em>2022-07-08</em></p>
 </div>
 <div id="libraries" class="section level1 hasAnchor">
 <h1><span class="header-section-number">1</span> Libraries<a href="#libraries" class="anchor-section" aria-label="Anchor link to header"></a></h1>
@@ -221,17 +221,19 @@ code span.wa { color: #da4453; } /* Warning */
 <h1><span class="header-section-number">3</span> Functions for Views<a href="#functions-for-views" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>table example</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="cf">if</span> (con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbExistsTable</span>(<span class="st">&quot;mtcars&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">isFALSE</span>()) {</a>
-<a class="sourceLine" id="cb5-2" title="2">    con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbWriteTable</span>(<span class="st">&quot;mtcars&quot;</span>, mtcars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>())</a>
+<a class="sourceLine" id="cb5-2" title="2">    con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbWriteTable</span>(<span class="st">&quot;mtcars&quot;</span>, mtcars)</a>
 <a class="sourceLine" id="cb5-3" title="3">}</a>
 <a class="sourceLine" id="cb5-4" title="4"></a>
-<a class="sourceLine" id="cb5-5" title="5">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbReadTable</span>(<span class="st">&quot;mtcars&quot;</span>)</a>
-<a class="sourceLine" id="cb5-6" title="6"><span class="co">##    mpg cyl disp  hp drat    wt  qsec vs am gear carb</span></a>
-<a class="sourceLine" id="cb5-7" title="7"><span class="co">## 1 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4</span></a>
-<a class="sourceLine" id="cb5-8" title="8"><span class="co">## 2 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4</span></a>
-<a class="sourceLine" id="cb5-9" title="9"><span class="co">## 3 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1</span></a>
-<a class="sourceLine" id="cb5-10" title="10"><span class="co">## 4 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1</span></a>
-<a class="sourceLine" id="cb5-11" title="11"><span class="co">## 5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</span></a>
-<a class="sourceLine" id="cb5-12" title="12"><span class="co">## 6 18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</span></a></code></pre></div>
+<a class="sourceLine" id="cb5-5" title="5">con <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="st">    </span><span class="kw">dbReadTable</span>(<span class="st">&quot;mtcars&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="st">    </span><span class="kw">head</span>()</a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="co">##    mpg cyl disp  hp drat    wt  qsec vs am gear carb</span></a>
+<a class="sourceLine" id="cb5-9" title="9"><span class="co">## 1 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4</span></a>
+<a class="sourceLine" id="cb5-10" title="10"><span class="co">## 2 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4</span></a>
+<a class="sourceLine" id="cb5-11" title="11"><span class="co">## 3 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1</span></a>
+<a class="sourceLine" id="cb5-12" title="12"><span class="co">## 4 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1</span></a>
+<a class="sourceLine" id="cb5-13" title="13"><span class="co">## 5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</span></a>
+<a class="sourceLine" id="cb5-14" title="14"><span class="co">## 6 18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</span></a></code></pre></div>
 <div id="create-a-view" class="section level2 hasAnchor">
 <h2><span class="header-section-number">3.1</span> Create a View<a href="#create-a-view" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div id="create-a-view-from-a-sql-select-statement" class="section level3 hasAnchor">
@@ -273,7 +275,7 @@ code span.wa { color: #da4453; } /* Warning */
 <a class="sourceLine" id="cb7-9" title="9">purrr<span class="op">::</span><span class="kw">map2_lgl</span>(sqls, names, <span class="op">~</span><span class="st"> </span><span class="kw">dbCreateView</span>(con, .x, .y))</a>
 <a class="sourceLine" id="cb7-10" title="10"><span class="co">## [1] TRUE TRUE TRUE</span></a>
 <a class="sourceLine" id="cb7-11" title="11">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListViews</span>()</a>
-<a class="sourceLine" id="cb7-12" title="12"><span class="co">## [1] &quot;view_cyl=8&quot; &quot;view_cyl=6&quot; &quot;view_cyl=4&quot;</span></a></code></pre></div>
+<a class="sourceLine" id="cb7-12" title="12"><span class="co">## [1] &quot;view_cyl=4&quot; &quot;view_cyl=6&quot; &quot;view_cyl=8&quot;</span></a></code></pre></div>
 </div>
 </div>
 <div id="create-a-view-from-a-tbl_lazy" class="section level3 hasAnchor">
@@ -310,38 +312,52 @@ code span.wa { color: #da4453; } /* Warning */
 <ul>
 <li>Lists all view names, including tempoary ones.</li>
 <li>Returns a vector of strings represeting view names.</li>
-<li>The arguments <code>parmanent = TRUE</code> and <code>temporary = TRUE</code> specify whether to include non-temporal and tempoary views, respectively. <code>NULL</code> is returned if both are set to <code>FALSE</code>.</li>
+<li>The arguments <code>parmanent = TRUE</code> and <code>temporary = TRUE</code> specify whether to include non-temporal and tempoary views, respectively. An empty character is returned if both are set to <code>FALSE</code>.</li>
 </ul>
 <div id="definition-2" class="section level3 hasAnchor">
 <h3><span class="header-section-number">3.2.1</span> Definition<a href="#definition-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">dbListViews &lt;-<span class="st"> </span><span class="cf">function</span>(con, <span class="dt">parmanent =</span> <span class="ot">TRUE</span>, <span class="dt">temporary =</span> <span class="ot">TRUE</span>) {</a>
-<a class="sourceLine" id="cb9-2" title="2">    <span class="cf">if</span> (<span class="kw">c</span>(parmanent, temporary) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">all</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">isFALSE</span>()) {</a>
-<a class="sourceLine" id="cb9-3" title="3">        <span class="ot">NULL</span> <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-4" title="4"><span class="st">            </span><span class="kw">invisible</span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-5" title="5"><span class="st">            </span><span class="kw">return</span>()</a>
-<a class="sourceLine" id="cb9-6" title="6">    }</a>
-<a class="sourceLine" id="cb9-7" title="7">    sql &lt;-<span class="st"> &quot;?p ?u ?t&quot;</span></a>
-<a class="sourceLine" id="cb9-8" title="8">    parm &lt;-<span class="st"> &quot;SELECT pg_views.viewname AS viewname FROM pg_views WHERE schemaname = current_schema()&quot;</span></a>
-<a class="sourceLine" id="cb9-9" title="9">    tmp &lt;-<span class="st"> &quot;SELECT viewname FROM pg_views WHERE schemaname LIKE &#39;pg_temp_%&#39;&quot;</span></a>
-<a class="sourceLine" id="cb9-10" title="10">    <span class="kw">sqlInterpolate</span>(</a>
-<a class="sourceLine" id="cb9-11" title="11">        con,</a>
-<a class="sourceLine" id="cb9-12" title="12">        sql,</a>
-<a class="sourceLine" id="cb9-13" title="13">        <span class="dt">p =</span> dplyr<span class="op">::</span><span class="kw">if_else</span>(parmanent, parm, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">SQL</span>(),</a>
-<a class="sourceLine" id="cb9-14" title="14">        <span class="dt">u =</span> dplyr<span class="op">::</span><span class="kw">if_else</span>(<span class="kw">c</span>(parmanent, temporary) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">all</span>(), <span class="st">&quot;UNION&quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">SQL</span>(),</a>
-<a class="sourceLine" id="cb9-15" title="15">        <span class="dt">t =</span> dplyr<span class="op">::</span><span class="kw">if_else</span>(temporary, tmp, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">SQL</span>()</a>
-<a class="sourceLine" id="cb9-16" title="16">    ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-17" title="17"><span class="st">        </span><span class="kw">dbGetQuery</span>(con, .) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-18" title="18"><span class="st">        </span><span class="kw">pull</span>(viewname)</a>
-<a class="sourceLine" id="cb9-19" title="19">}</a></code></pre></div>
+<a class="sourceLine" id="cb9-2" title="2">    ret &lt;-<span class="st"> </span><span class="kw">character</span>()</a>
+<a class="sourceLine" id="cb9-3" title="3">    <span class="co"># this returns all views, temporary or not</span></a>
+<a class="sourceLine" id="cb9-4" title="4">    list_views &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</a>
+<a class="sourceLine" id="cb9-5" title="5">        x <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-6" title="6"><span class="st">            </span><span class="kw">dbListTables</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-7" title="7"><span class="st">            </span><span class="kw">setdiff</span>(</a>
+<a class="sourceLine" id="cb9-8" title="8">                x <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-9" title="9"><span class="st">                    </span>DBI<span class="op">::</span><span class="kw">dbGetQuery</span>(</a>
+<a class="sourceLine" id="cb9-10" title="10">                        <span class="dt">statement =</span> <span class="st">&quot;SELECT tablename FROM pg_tables WHERE schemaname = current_schema()&quot;</span></a>
+<a class="sourceLine" id="cb9-11" title="11">                    ) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pull</span>(<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb9-12" title="12">            )</a>
+<a class="sourceLine" id="cb9-13" title="13">    }</a>
+<a class="sourceLine" id="cb9-14" title="14">    <span class="co"># retruns only non-temporary views</span></a>
+<a class="sourceLine" id="cb9-15" title="15">    parm_views &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</a>
+<a class="sourceLine" id="cb9-16" title="16">        x <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-17" title="17"><span class="st">            </span><span class="kw">dbGetQuery</span>(</a>
+<a class="sourceLine" id="cb9-18" title="18">                <span class="dt">statement =</span> <span class="st">&quot;SELECT viewname FROM pg_views WHERE schemaname = current_schema()&quot;</span></a>
+<a class="sourceLine" id="cb9-19" title="19">            ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-20" title="20"><span class="st">            </span><span class="kw">pull</span>(<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb9-21" title="21">    }</a>
+<a class="sourceLine" id="cb9-22" title="22">    <span class="co"># we can&#39;t use dplyr::case_when here, which requires the returned values be the same type and the same length.</span></a>
+<a class="sourceLine" id="cb9-23" title="23">    <span class="cf">if</span> (parmanent <span class="op">&amp;</span><span class="st"> </span>temporary) {</a>
+<a class="sourceLine" id="cb9-24" title="24">        ret &lt;-<span class="st"> </span>con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">list_views</span>()</a>
+<a class="sourceLine" id="cb9-25" title="25">    } <span class="cf">else</span> <span class="cf">if</span> (parmanent) {</a>
+<a class="sourceLine" id="cb9-26" title="26">        ret &lt;-<span class="st"> </span>con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">parm_views</span>()</a>
+<a class="sourceLine" id="cb9-27" title="27">    } <span class="cf">else</span> <span class="cf">if</span> (temporary) {</a>
+<a class="sourceLine" id="cb9-28" title="28">        ret &lt;-<span class="st"> </span>con <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-29" title="29"><span class="st">            </span><span class="kw">list_views</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-30" title="30"><span class="st">            </span><span class="kw">setdiff</span>(con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">parm_views</span>())</a>
+<a class="sourceLine" id="cb9-31" title="31">    }</a>
+<a class="sourceLine" id="cb9-32" title="32">    ret <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">return</span>()</a>
+<a class="sourceLine" id="cb9-33" title="33">}</a></code></pre></div>
 </div>
 <div id="example-2" class="section level3 hasAnchor">
 <h3><span class="header-section-number">3.2.2</span> Example<a href="#example-2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 </div>
 </div>
-<div id="test-existance-of-a-view" class="section level2 hasAnchor">
-<h2><span class="header-section-number">3.3</span> Test existance of a view<a href="#test-existance-of-a-view" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="test-existence-of-a-view" class="section level2 hasAnchor">
+<h2><span class="header-section-number">3.3</span> Test existence of a view<a href="#test-existence-of-a-view" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
-<li>Test the existance of views.</li>
+<li>Test the existence of views.</li>
 <li>Returns a logical vector of the same length as the input.</li>
 <li>Accpepts the same arguments as <code>dbCreateView</code>.</li>
 </ul>
@@ -391,7 +407,7 @@ code span.wa { color: #da4453; } /* Warning */
 <a class="sourceLine" id="cb12-5" title="5">purrr<span class="op">::</span><span class="kw">map2_lgl</span>(names, tmps, <span class="op">~</span><span class="st"> </span><span class="kw">dbCreateView</span>(con, sql, .x, <span class="dt">temporary =</span> .y)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">invisible</span>() <span class="co"># discard output</span></a>
 <a class="sourceLine" id="cb12-6" title="6"></a>
 <a class="sourceLine" id="cb12-7" title="7">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListViews</span>()</a>
-<a class="sourceLine" id="cb12-8" title="8"><span class="co">## [1] &quot;view1&quot; &quot;view2&quot; &quot;view4&quot; &quot;view3&quot;</span></a>
+<a class="sourceLine" id="cb12-8" title="8"><span class="co">## [1] &quot;view3&quot; &quot;view1&quot; &quot;view2&quot; &quot;view4&quot;</span></a>
 <a class="sourceLine" id="cb12-9" title="9"></a>
 <a class="sourceLine" id="cb12-10" title="10"><span class="co"># drop only temporary views</span></a>
 <a class="sourceLine" id="cb12-11" title="11">con <span class="op">%&gt;%</span></a>
@@ -401,7 +417,7 @@ code span.wa { color: #da4453; } /* Warning */
 <a class="sourceLine" id="cb12-15" title="15"><span class="co">## [1] 2</span></a>
 <a class="sourceLine" id="cb12-16" title="16"></a>
 <a class="sourceLine" id="cb12-17" title="17">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListViews</span>() <span class="co"># non-temporary views are still alive</span></a>
-<a class="sourceLine" id="cb12-18" title="18"><span class="co">## [1] &quot;view4&quot; &quot;view3&quot;</span></a>
+<a class="sourceLine" id="cb12-18" title="18"><span class="co">## [1] &quot;view3&quot; &quot;view4&quot;</span></a>
 <a class="sourceLine" id="cb12-19" title="19"></a>
 <a class="sourceLine" id="cb12-20" title="20"><span class="co"># drop them</span></a>
 <a class="sourceLine" id="cb12-21" title="21">con <span class="op">%&gt;%</span></a>
@@ -471,7 +487,7 @@ code span.wa { color: #da4453; } /* Warning */
 <a class="sourceLine" id="cb15-5" title="5">}</a>
 <a class="sourceLine" id="cb15-6" title="6"></a>
 <a class="sourceLine" id="cb15-7" title="7">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListViews</span>()</a>
-<a class="sourceLine" id="cb15-8" title="8"><span class="co">## [1] &quot;view1&quot; &quot;view2&quot; &quot;view4&quot; &quot;view3&quot;</span></a>
+<a class="sourceLine" id="cb15-8" title="8"><span class="co">## [1] &quot;view4&quot; &quot;view1&quot; &quot;view2&quot; &quot;view3&quot;</span></a>
 <a class="sourceLine" id="cb15-9" title="9">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbDiscard</span>(<span class="dt">temporary =</span> <span class="ot">TRUE</span>) <span class="co"># delte all temporary objects</span></a>
 <a class="sourceLine" id="cb15-10" title="10">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListViews</span>() <span class="co"># non-temporary views are stil alive</span></a>
 <a class="sourceLine" id="cb15-11" title="11"><span class="co">## [1] &quot;view4&quot; &quot;view3&quot;</span></a></code></pre></div>

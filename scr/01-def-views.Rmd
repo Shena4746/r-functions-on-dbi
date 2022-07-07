@@ -40,23 +40,37 @@ CreateView <- function(con, tbl, name, or_replace = FALSE, temporary = FALSE) {
 
 ```{r def-list-views}
 dbListViews <- function(con, parmanent = TRUE, temporary = TRUE) {
-    if (c(parmanent, temporary) %>% all() %>% isFALSE()) {
-        NULL %>%
-            invisible() %>%
-            return()
+    ret <- character()
+    # this returns all views, temporary or not
+    list_views <- function(x) {
+        x %>%
+            dbListTables() %>%
+            setdiff(
+                x %>%
+                    DBI::dbGetQuery(
+                        statement = "SELECT tablename FROM pg_tables WHERE schemaname = current_schema()"
+                    ) %>% pull(1)
+            )
     }
-    sql <- "?p ?u ?t"
-    parm <- "SELECT pg_views.viewname AS viewname FROM pg_views WHERE schemaname = current_schema()"
-    tmp <- "SELECT viewname FROM pg_views WHERE schemaname LIKE 'pg_temp_%'"
-    sqlInterpolate(
-        con,
-        sql,
-        p = dplyr::if_else(parmanent, parm, "") %>% SQL(),
-        u = dplyr::if_else(c(parmanent, temporary) %>% all(), "UNION", "") %>% SQL(),
-        t = dplyr::if_else(temporary, tmp, "") %>% SQL()
-    ) %>%
-        dbGetQuery(con, .) %>%
-        pull(viewname)
+    # retruns only non-temporary views
+    parm_views <- function(x) {
+        x %>%
+            dbGetQuery(
+                statement = "SELECT viewname FROM pg_views WHERE schemaname = current_schema()"
+            ) %>%
+            pull(1)
+    }
+    # we can't use dplyr::case_when here, which requires the returned values be the same type and the same length.
+    if (parmanent & temporary) {
+        ret <- con %>% list_views()
+    } else if (parmanent) {
+        ret <- con %>% parm_views()
+    } else if (temporary) {
+        ret <- con %>%
+            list_views() %>%
+            setdiff(con %>% parm_views())
+    }
+    ret %>% return()
 }
 ```
 

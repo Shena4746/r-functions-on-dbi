@@ -27,10 +27,12 @@ table example
 
 ```{r prepare-mtcars-table}
 if (con %>% dbExistsTable("mtcars") %>% isFALSE()) {
-    con %>% dbWriteTable("mtcars", mtcars %>% head())
+    con %>% dbWriteTable("mtcars", mtcars)
 }
 
-con %>% dbReadTable("mtcars")
+con %>%
+    dbReadTable("mtcars") %>%
+    head()
 ```
 
 ## Create a View
@@ -86,7 +88,7 @@ con %>% drop_all_views()
 
 - Lists all view names, including tempoary ones.
 - Returns a vector of strings represeting view names.
-- The arguments `parmanent = TRUE` and `temporary = TRUE` specify whether to include non-temporal and tempoary views, respectively. `NULL` is returned if both are set to `FALSE`.
+- The arguments `parmanent = TRUE` and `temporary = TRUE` specify whether to include non-temporal and tempoary views, respectively. An empty character is returned if both are set to `FALSE`.
 
 ### Definition
 ```{r def-list-views-show, ref.label='def-list-views'}

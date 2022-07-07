@@ -11,7 +11,7 @@ example-1
 list-views
 definition-2
 example-2
-test-existance-of-a-view
+test-existence-of-a-view
 definition-3
 example-3
 drop

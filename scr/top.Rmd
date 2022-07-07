@@ -1,9 +1,9 @@
 ---
-title: "Code Examples for DBI and RPostgres"
+title: "Supplementary functions for DBI + RPostgres"
 author: "Shena"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
-github-repo: 'Shena4746/datascience-100knocks-preprocess-R'
+github-repo: 'https://github.com/Shena4746/r-functions-on-dbi'
 ---
 
 ```{r knit-setting-for-top, eval = TRUE, include=FALSE}
