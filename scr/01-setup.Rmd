@@ -1,0 +1,34 @@
+# Connection
+
+```{r knit-setting-for-setup, eval = TRUE, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE, collapse = TRUE)
+```
+
+```{r def-issue_con}
+issue_con <- function(service_name) {
+    dw <- config::get(service_name)
+    con <- DBI::dbConnect(
+        drv = RPostgres::Postgres(),
+        host = dw$host,
+        port = dw$port,
+        dbname = dw$dbname,
+        user = dw$user,
+        password = dw$password
+    )
+}
+```
+
+```{r refresh_con, include=FALSE}
+refresh_con <- function(x) {
+    try(x %>% DBI::dbDisconnect())
+    issue_con("demo")
+}
+```
+
+```{r first-connection, eval = FALSE}
+con <- issue_con("demo")
+```
+
+```{r connect_by_refresh, include=FALSE}
+con <- refresh_con(con)
+```

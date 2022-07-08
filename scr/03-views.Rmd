@@ -1,0 +1,258 @@
+# Functions for Views
+
+```{r knit-setting-for-views, eval = TRUE, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE, collapse = TRUE)
+```
+
+```{r function-drop-all-views, include=FALSE}
+drop_all_views <- function(con) {
+    con %>%
+        dbListViews() %>%
+        purrr::map_int(~ dbDropView(con, .x, cascade = TRUE, if_exists = TRUE)) %>%
+        sum()
+}
+```
+
+```{r function-drop-all-tables, include=FALSE}
+drop_all_tables <- function(conn, names.except = NULL, if_exists = TRUE, cascade = TRUE) {
+    if (names.except %>% inherits(c("character", "NULL")) %>% isFALSE()) {
+        stop("proviede names.except must be of character-like class.")
+    }
+    con %>%
+        DBI::dbListTables() %>%
+        base::setdiff(con %>% dbListViews()) %>%
+        base::setdiff(names.except) %>%
+        purrr::map_int(~ dbDropTables(con, .x, if_exists, cascade)) %>%
+        invisible()
+}
+```
+
+```{r execute-drop-all-views, eval=FALSE, include=FALSE}
+con %>% drop_all_views()
+```
+
+```{r execute-clear-all-tables, include=FALSE}
+# clear views and table, if any
+con %>% drop_all_tables()
+```
+
+table example
+
+```{r prepare-mtcars-table}
+if (con %>% dbExistsTable("mtcars") %>% isFALSE()) {
+    con %>% dbWriteTable("mtcars", mtcars)
+}
+
+con %>%
+    dbReadTable("mtcars") %>%
+    head()
+```
+
+## Create a View
+
+- Creates a view from the passed SQL query.
+- Returns `TRUE` invisibly.
+- `temporary = FALSE` and `or_replace = FALSE` arguments specify whether to enable `TEMPORARY` and `OR REPLACE` options, respectively. 
+
+### Definition
+
+```{r def-create-view-dbi-show, ref.label='def-create-view-dbi', eval=FALSE}
+```
+
+Since `DBI::dbExecute` does not accept multiple statements, `dbCreateView` is not subject to SQL injection of that form.
+
+### Example
+
+```{r create-view-actually-creates-view-example}
+if (con %>% dbExistsTable("cars") %>% isFALSE()) con %>% dbWriteTable("cars", cars)
+
+con %>% dbCreateView(
+    name = "view_cars_20",
+    sql = "SELECT * FROM cars WHERE dist < 20"
+)
+con %>% dbReadTable("view_cars_20")
+
+# see the view properly follow the change in the referred table
+con %>% dbAppendTable("cars", data.frame(speed = 7, dist = 19))
+con %>% dbReadTable("view_cars_20")
+```
+
+```{r, include=FALSE}
+con %>% drop_all_tables(names.except = "mtcars")
+```
+
+Tempoary views vanish when temporary resources are freed, which happenes, for instance, when `dbDisconnect()` is executed. 
+
+```{r create-temp-view-example}
+sql <- "SELECT * FROM mtcars"
+con %>% dbCreateView("view_permanent", sql)
+con %>% dbCreateView("view_temporary", sql, temporary = TRUE)
+con %>% dbListTables()
+# reconnect
+con %>% dbDisconnect()
+con <- issue_con("demo")
+# temprary table has vanished
+con %>% dbListTables()
+```
+
+```{r ref.label='execute-drop-all-views', include=FALSE}
+```
+
+Given a set of `SELECT` queries and names that should be complied as views, you can create those views at once.
+
+```{r create-many-views-at-once}
+cyls <- c(4, 6, 8)
+names <- purrr::map(cyls, ~ paste("view_cyl=", .x, sep = ""))
+sqls <- purrr::map(cyls, ~ sqlInterpolate(
+    con,
+    "SELECT * FROM mtcars WHERE cyl = ?cyl",
+    cyl = .x
+))
+# vectorised view creation
+purrr::map2_lgl(names, sqls, ~ dbCreateView(con, .x, .y))
+con %>% dbListTables()
+```
+
+The combination of `dbCreateView()` and the dbplyr package allows you to create views without writing any SQL statements. This is often much quicker than working with SQL.
+
+```{r create-views-lazy}
+if (con %>% dbExistsTable("flights") %>% isFALSE()) con %>% dbWriteTable("flights", nycflights13::flights)
+
+# get all rows with no missing values
+flights_no_NA <- tbl(con, "flights") %>%
+    filter(if_all(everything(), ~ !is.na(.)))
+flights_no_NA %>% class()
+
+con %>% dbCreateView(
+    name = "flights_no_NA",
+    sql = flights_no_NA %>% dbplyr::sql_render()
+)
+con %>% tbl("flights_no_NA")
+```
+
+```{r ref.label='execute-drop-all-views', include=FALSE}
+```
+
+```{r remove-flights, include=FALSE}
+con %>% drop_all_tables(names.except = "mtcars")
+```
+
+## List views
+
+- Lists all view names, including tempoary ones.
+- Returns a vector of strings represeting view names.
+- The arguments `permanent = TRUE` and `temporary = TRUE` specify whether to include non-temporal and tempoary views, respectively. An empty character will be returned if both are set to `FALSE`.
+
+### Definition
+```{r def-list-views-show, ref.label='def-list-views'}
+```
+
+### Example
+
+```{r list-view-example}
+N <- 3
+sql <- "SELECT * FROM mtcars"
+names <- purrr::map(1:N, ~ paste("view_", .x, sep = ""))
+names_tmp <- purrr::map(1:N, ~ paste("view_temp_", .x, sep = ""))
+# non-temporary views
+purrr::map_lgl(names, ~ dbCreateView(con, .x, sql))
+# temporary views
+purrr::map_lgl(names_tmp, ~ dbCreateView(con, .x, sql, temporary = TRUE))
+
+# show temoporary views
+con %>% dbListViews(permanent = FALSE)
+# show non-temoporary views
+con %>% dbListViews(temporary = FALSE)
+```
+
+```{r ref.label='execute-drop-all-views', include=FALSE}
+```
+
+## Test existence of a view
+
+- Test the existence of views.
+- Returns a logical vector of the same length as the input.
+- Accpepts the same arguments as `dbCreateView`.
+
+### Definition
+
+```{r def-exists-view-show, ref.label='def-exists-view'}
+```
+
+### Example
+
+```{r test-views-example}
+sql <- "SELECT * FROM mtcars"
+purrr::map2_lgl(
+    .x = c("view", "view_temp"),
+    .y = c(FALSE, TRUE),
+    .f = ~ dbCreateView(con, .x, sql, temporary = .y)
+)
+
+viewnames <- c("view", "view_temp", "view_absent")
+con %>% dbExistsViews(viewnames)
+con %>% dbExistsViews(viewnames, permanent = FALSE)
+con %>% dbExistsViews(viewnames, temporary = FALSE)
+```
+
+```{r ref.label='execute-drop-all-views', include=FALSE}
+```
+
+## Drop a view {#dropview}
+
+- Drops a view.
+- Returns the total number of views dropped, invisibly.
+- The arguments `if_exists = FALSE` and `cascade = FALSE` specify whether to enable the corresponding SQL options. If `cascade = FALSE`, the default, then `RESTRICT` option is set.
+
+### Definition
+
+```{r def-drop-view-show, ref.label='def-drop-view'}
+```
+
+### Example
+
+View can be dropped in a vectorised way. If you are dropping temprary views only, then you can also use the `DISCARD` statement \@ref(discard).
+
+```{r drop-all-temporary-views-example}
+# create views to demonstrate a vectorised removal
+sql <- "SELECT * FROM mtcars LIMIT 10"
+names <- purrr::map(1:4, ~ paste("view", .x, sep = ""))
+tmps <- purrr::map(1:4, ~ .x <= 2)
+purrr::map2_lgl(names, tmps, ~ dbCreateView(con, .x, sql, temporary = .y)) %>% invisible() # discard output
+
+con %>% dbListViews()
+
+# drop only temporary views
+con %>%
+    dbListViews(temporary = TRUE, permanent = FALSE) %>%
+    purrr::map_int(~ dbDropView(con, .x)) %>%
+    sum() # total number of tables dropped
+
+con %>% dbListViews() # non-temporary views are still alive
+
+# drop them
+con %>%
+    dbListViews(temporary = FALSE, permanent = TRUE) %>%
+    purrr::map_int(~ dbDropView(con, .x)) %>%
+    sum()
+
+con %>% dbListViews()
+```
+
+Dependent views could be a source of an error during this vectorised removal. Set `if_exists = TRUE` whenever `cascade = TRUE` to avoid this problem.
+
+```{r drop-view-example-cascading, error=TRUE}
+con %>% dbCreateView(
+    name = "view_super",
+    sql = "SELECT * FROM mtcars LIMIT 10"
+)
+con %>% dbCreateView(
+    name = "view_sub",
+    sql = "SELECT * FROM view_super LIMIT 10"
+)
+
+# set `if_exists = TRUE` to skip an cascade-dropped view
+c("view_super", "view_sub") %>%
+    purrr::map(~ dbDropView(con, .x, cascade = TRUE))
+```
+

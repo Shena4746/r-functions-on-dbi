@@ -4,7 +4,7 @@ knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE,
 
 # Misc
 
-## Free resources {#discard}
+## Free Resources {#discard}
 
 - Executes a `DISCARD` SQL statement.
 - Returns `TRUE` invisibly even if it does nothing.
@@ -17,23 +17,89 @@ knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE,
 
 ### Example
 
-`DISCARD TEMPORARY` removes tempoary views at once, intead of listing and dropping them, as we did in \@ref(drop).
+`DISCARD TEMPORARY` frees all tempoary resources at once, including tempoary views, intead of listing and dropping them, as we did in \@ref(dropview).
 
 ```{r discard-temprary-view}
 # prepare temporary and non-temporary views
 sql <- "SELECT * FROM mtcars LIMIT 10"
-for (i in 1:4) {
-    dbCreateView(con, sql, paste("view", i, sep = ""), temporary = isTRUE(i <= 2))
-}
+purrr::map_lgl(
+    .x = 1:4,
+    ~ dbCreateView(
+        con,
+        name = paste("view", .x, sep = ""),
+        sql = sql,
+        temporary = isTRUE(.x <= 2)
+    )
+)
 
 con %>% dbListViews()
 con %>% dbDiscard(temporary = TRUE) # delte all temporary objects
 con %>% dbListViews() # non-temporary views are stil alive
 ```
 
-```{r clean-non-discarded-views, include=FALSE}
-con %>%
-    dbListViews() %>%
-    purrr::map_int(~ dbDropView(con, .x)) %>%
-    sum()
+```{r ref.label='execute-drop-all-views', include=FALSE}
+```
+
+## Drop a Table {#droptable}
+
+### Definition
+
+- Drop a table, with `IF EXISTS` and `CASCADE` option.
+- Returns the total number of views dropped, invisibly.
+- See \@ref(dropview) for the usage of optional arguments.
+
+```{r ref.label='def-drop-table', eval=FALSE}
+```
+
+### Example
+
+```{r, drop-tables-example, error=TRUE}
+sql <- "SELECT * FROM mtcars"
+purrr::map_lgl(
+    .x = 1:3,
+    .f = ~ dbCreateView(con, name = paste0("view", .x), sql)
+)
+con %>% dbListTables()
+
+# specifying a view causes an error
+con %>% dbDropTables("view2", if_exists = TRUE)
+con %>% dbListTables()
+
+# specifying a referred table deletes all the dependent views
+con %>% dbDropTables("mtcars", cascade = TRUE)
+con %>% dbListTables()
+```
+
+## Disconnect all Connections Variables
+
+### Definition
+
+- Disconnects all connection variables on the **global namespace**.
+- Retruns a vector of character that lists those connection variables that are disconnected by the function call.
+
+```{r ref.label='def-release-con', eval=FALSE}
+```
+
+### Example
+
+```{r release-cons-example, warning=TRUE}
+release_cons() %>% invisible()
+
+con1 <- issue_con("demo")
+con2 <- issue_con("demo")
+cons <- release_cons()
+
+cons %>% print()
+
+purrr::map_lgl(cons, ~ dbDisconnect(.x %>% get()))
+```
+
+```{r include=FALSE}
+con <- issue_con("demo")
+```
+
+```{r ref.label='execute-clear-all-tables', include=FALSE}
+```
+```{r exit-disconnect,include=FALSE}
+con %>% dbDisconnect()
 ```
