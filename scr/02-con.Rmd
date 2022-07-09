@@ -5,7 +5,7 @@
 knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE, collapse = TRUE)
 ```
 
-## Issue a Connection variable 
+## Issue a connection variable {#issue-con}
 
 - Retruns a new `DBIConnection` object used to communicate with a database.
 - It is recommended that you make sure you have disconnected old connections before using this.
@@ -26,7 +26,7 @@ con <- issue_con("demo")
 con %>% print()
 ```
 
-## Disconnect Connections {#release_cons}
+## Disconnect connections {#release-cons}
 
 ### Definition
 

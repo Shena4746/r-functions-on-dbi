@@ -48,7 +48,7 @@ con %>%
     head()
 ```
 
-## Create a View
+## Create a view {#create-view}
 
 - Creates a view from the passed SQL query.
 - Returns `TRUE` invisibly.
@@ -156,7 +156,7 @@ flights_view %>% head()
 con %>% drop_all_tables(names.except = "mtcars")
 ```
 
-## List views
+## List views {#list-views}
 
 - Lists all view names, including temporary ones.
 - Returns a vector of strings representing view names.
@@ -187,7 +187,7 @@ con %>% dbListViews(temporary = FALSE)
 ```{r ref.label='execute-drop-all-views', include=FALSE}
 ```
 
-## Test existence of a view
+## Test existence of views {#test-views}
 
 - Test the existence of views.
 - Returns a logical vector of the same length as the input.
@@ -217,7 +217,7 @@ con %>% dbExistsViews(viewnames, temporary = FALSE)
 ```{r ref.label='execute-drop-all-views', include=FALSE}
 ```
 
-## Drop a view {#dropview}
+## Drop a view {#drop-view}
 
 - Drops a view.
 - Returns the total number of views dropped, invisibly.

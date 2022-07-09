@@ -23,7 +23,7 @@
 <meta name="author" content="Shena" />
 
 
-<meta name="date" content="2022-07-09" />
+<meta name="date" content="2022-07-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -138,17 +138,17 @@ code span.wa { color: #da4453; } /* Warning */
 <li class="chapter" data-level="1.1" data-path=""><a href="#libraries"><i class="fa fa-check"></i><b>1.1</b> Libraries</a></li>
 </ul></li>
 <li class="chapter" data-level="2" data-path=""><a href="#connections"><i class="fa fa-check"></i><b>2</b> Connections</a><ul>
-<li class="chapter" data-level="2.1" data-path=""><a href="#issue-a-connection-variable"><i class="fa fa-check"></i><b>2.1</b> Issue a Connection variable</a><ul>
+<li class="chapter" data-level="2.1" data-path=""><a href="#issue-con"><i class="fa fa-check"></i><b>2.1</b> Issue a connection variable</a><ul>
 <li class="chapter" data-level="2.1.1" data-path=""><a href="#definition"><i class="fa fa-check"></i><b>2.1.1</b> Definition</a></li>
 <li class="chapter" data-level="2.1.2" data-path=""><a href="#example"><i class="fa fa-check"></i><b>2.1.2</b> Example</a></li>
 </ul></li>
-<li class="chapter" data-level="2.2" data-path=""><a href="#release_cons"><i class="fa fa-check"></i><b>2.2</b> Disconnect Connections</a><ul>
+<li class="chapter" data-level="2.2" data-path=""><a href="#release-cons"><i class="fa fa-check"></i><b>2.2</b> Disconnect connections</a><ul>
 <li class="chapter" data-level="2.2.1" data-path=""><a href="#definition-1"><i class="fa fa-check"></i><b>2.2.1</b> Definition</a></li>
 <li class="chapter" data-level="2.2.2" data-path=""><a href="#example-1"><i class="fa fa-check"></i><b>2.2.2</b> Example</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path=""><a href="#views"><i class="fa fa-check"></i><b>3</b> Views</a><ul>
-<li class="chapter" data-level="3.1" data-path=""><a href="#create-a-view"><i class="fa fa-check"></i><b>3.1</b> Create a View</a><ul>
+<li class="chapter" data-level="3.1" data-path=""><a href="#create-view"><i class="fa fa-check"></i><b>3.1</b> Create a view</a><ul>
 <li class="chapter" data-level="3.1.1" data-path=""><a href="#definition-2"><i class="fa fa-check"></i><b>3.1.1</b> Definition</a></li>
 <li class="chapter" data-level="3.1.2" data-path=""><a href="#example-2"><i class="fa fa-check"></i><b>3.1.2</b> Example</a></li>
 </ul></li>
@@ -156,11 +156,11 @@ code span.wa { color: #da4453; } /* Warning */
 <li class="chapter" data-level="3.2.1" data-path=""><a href="#definition-3"><i class="fa fa-check"></i><b>3.2.1</b> Definition</a></li>
 <li class="chapter" data-level="3.2.2" data-path=""><a href="#example-3"><i class="fa fa-check"></i><b>3.2.2</b> Example</a></li>
 </ul></li>
-<li class="chapter" data-level="3.3" data-path=""><a href="#test-existence-of-a-view"><i class="fa fa-check"></i><b>3.3</b> Test existence of a view</a><ul>
+<li class="chapter" data-level="3.3" data-path=""><a href="#test-views"><i class="fa fa-check"></i><b>3.3</b> Test existence of views</a><ul>
 <li class="chapter" data-level="3.3.1" data-path=""><a href="#definition-4"><i class="fa fa-check"></i><b>3.3.1</b> Definition</a></li>
 <li class="chapter" data-level="3.3.2" data-path=""><a href="#example-4"><i class="fa fa-check"></i><b>3.3.2</b> Example</a></li>
 </ul></li>
-<li class="chapter" data-level="3.4" data-path=""><a href="#dropview"><i class="fa fa-check"></i><b>3.4</b> Drop a view</a><ul>
+<li class="chapter" data-level="3.4" data-path=""><a href="#drop-view"><i class="fa fa-check"></i><b>3.4</b> Drop a view</a><ul>
 <li class="chapter" data-level="3.4.1" data-path=""><a href="#definition-5"><i class="fa fa-check"></i><b>3.4.1</b> Definition</a></li>
 <li class="chapter" data-level="3.4.2" data-path=""><a href="#example-5"><i class="fa fa-check"></i><b>3.4.2</b> Example</a></li>
 </ul></li>
@@ -170,7 +170,7 @@ code span.wa { color: #da4453; } /* Warning */
 <li class="chapter" data-level="4.1.1" data-path=""><a href="#definition-6"><i class="fa fa-check"></i><b>4.1.1</b> Definition</a></li>
 <li class="chapter" data-level="4.1.2" data-path=""><a href="#example-6"><i class="fa fa-check"></i><b>4.1.2</b> Example</a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path=""><a href="#droptable"><i class="fa fa-check"></i><b>4.2</b> Drop a Table</a><ul>
+<li class="chapter" data-level="4.2" data-path=""><a href="#drop-table"><i class="fa fa-check"></i><b>4.2</b> Drop a Table</a><ul>
 <li class="chapter" data-level="4.2.1" data-path=""><a href="#definition-7"><i class="fa fa-check"></i><b>4.2.1</b> Definition</a></li>
 <li class="chapter" data-level="4.2.2" data-path=""><a href="#example-7"><i class="fa fa-check"></i><b>4.2.2</b> Example</a></li>
 </ul></li>
@@ -196,11 +196,15 @@ code span.wa { color: #da4453; } /* Warning */
 <div id="header">
 <h1 class="title">User-defined functions that DBI + RPostgres users should have</h1>
 <p class="author"><em>Shena</em></p>
-<p class="date"><em>2022-07-09</em></p>
+<p class="date"><em>2022-07-10</em></p>
 </div>
 <div id="about" class="section level1 hasAnchor">
 <h1><span class="header-section-number">1</span> About<a href="#about" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><a href="https://github.com/Shena4746/r-functions-on-dbi">README on github</a>.</p>
+<p>test
+<a href="#create-view">3.1</a>
+<a href="#test-views">3.3</a>
+<a href="#drop-view">3.4</a></p>
 <div id="libraries" class="section level2 hasAnchor">
 <h2><span class="header-section-number">1.1</span> Libraries<a href="#libraries" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This document is based on the following libraries.</p>
@@ -220,8 +224,8 @@ code span.wa { color: #da4453; } /* Warning */
 </div>
 <div id="connections" class="section level1 hasAnchor">
 <h1><span class="header-section-number">2</span> Connections<a href="#connections" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<div id="issue-a-connection-variable" class="section level2 hasAnchor">
-<h2><span class="header-section-number">2.1</span> Issue a Connection variable<a href="#issue-a-connection-variable" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="issue-con" class="section level2 hasAnchor">
+<h2><span class="header-section-number">2.1</span> Issue a connection variable<a href="#issue-con" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
 <li>Retruns a new <code>DBIConnection</code> object used to communicate with a database.</li>
 <li>It is recommended that you make sure you have disconnected old connections before using this.</li>
@@ -251,8 +255,8 @@ code span.wa { color: #da4453; } /* Warning */
 <a class="sourceLine" id="cb3-5" title="5"><span class="co">## &lt;PqConnection&gt; demo@localhost:5432</span></a></code></pre></div>
 </div>
 </div>
-<div id="release_cons" class="section level2 hasAnchor">
-<h2><span class="header-section-number">2.2</span> Disconnect Connections<a href="#release_cons" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="release-cons" class="section level2 hasAnchor">
+<h2><span class="header-section-number">2.2</span> Disconnect connections<a href="#release-cons" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div id="definition-1" class="section level3 hasAnchor">
 <h3><span class="header-section-number">2.2.1</span> Definition<a href="#definition-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
@@ -338,8 +342,8 @@ code span.wa { color: #da4453; } /* Warning */
 <a class="sourceLine" id="cb6-12" title="12"><span class="co">## 4 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1</span></a>
 <a class="sourceLine" id="cb6-13" title="13"><span class="co">## 5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</span></a>
 <a class="sourceLine" id="cb6-14" title="14"><span class="co">## 6 18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</span></a></code></pre></div>
-<div id="create-a-view" class="section level2 hasAnchor">
-<h2><span class="header-section-number">3.1</span> Create a View<a href="#create-a-view" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="create-view" class="section level2 hasAnchor">
+<h2><span class="header-section-number">3.1</span> Create a view<a href="#create-view" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
 <li>Creates a view from the passed SQL query.</li>
 <li>Returns <code>TRUE</code> invisibly.</li>
@@ -550,8 +554,8 @@ code span.wa { color: #da4453; } /* Warning */
 <a class="sourceLine" id="cb13-17" title="17"><span class="co">## [1] &quot;view_1&quot; &quot;view_2&quot; &quot;view_3&quot;</span></a></code></pre></div>
 </div>
 </div>
-<div id="test-existence-of-a-view" class="section level2 hasAnchor">
-<h2><span class="header-section-number">3.3</span> Test existence of a view<a href="#test-existence-of-a-view" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="test-views" class="section level2 hasAnchor">
+<h2><span class="header-section-number">3.3</span> Test existence of views<a href="#test-views" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
 <li>Test the existence of views.</li>
 <li>Returns a logical vector of the same length as the input.</li>
@@ -582,8 +586,8 @@ code span.wa { color: #da4453; } /* Warning */
 <a class="sourceLine" id="cb15-15" title="15"><span class="co">## [1]  TRUE FALSE FALSE</span></a></code></pre></div>
 </div>
 </div>
-<div id="dropview" class="section level2 hasAnchor">
-<h2><span class="header-section-number">3.4</span> Drop a view<a href="#dropview" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="drop-view" class="section level2 hasAnchor">
+<h2><span class="header-section-number">3.4</span> Drop a view<a href="#drop-view" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
 <li>Drops a view.</li>
 <li>Returns the total number of views dropped, invisibly.</li>
@@ -616,7 +620,7 @@ code span.wa { color: #da4453; } /* Warning */
 <a class="sourceLine" id="cb17-5" title="5">purrr<span class="op">::</span><span class="kw">map2_lgl</span>(names, tmps, <span class="op">~</span><span class="st"> </span><span class="kw">dbCreateView</span>(con, .x, sql, <span class="dt">temporary =</span> .y)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">invisible</span>() <span class="co"># discard output</span></a>
 <a class="sourceLine" id="cb17-6" title="6"></a>
 <a class="sourceLine" id="cb17-7" title="7">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListViews</span>()</a>
-<a class="sourceLine" id="cb17-8" title="8"><span class="co">## [1] &quot;view2&quot; &quot;view3&quot; &quot;view4&quot; &quot;view1&quot;</span></a>
+<a class="sourceLine" id="cb17-8" title="8"><span class="co">## [1] &quot;view1&quot; &quot;view2&quot; &quot;view3&quot; &quot;view4&quot;</span></a>
 <a class="sourceLine" id="cb17-9" title="9"></a>
 <a class="sourceLine" id="cb17-10" title="10"><span class="co"># drop only temporary views</span></a>
 <a class="sourceLine" id="cb17-11" title="11">con <span class="op">%&gt;%</span></a>
@@ -687,7 +691,7 @@ code span.wa { color: #da4453; } /* Warning */
 </div>
 <div id="example-6" class="section level3 hasAnchor">
 <h3><span class="header-section-number">4.1.2</span> Example<a href="#example-6" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p><code>DISCARD TEMPORARY</code> frees all tempoary resources at once, including tempoary views, instead of listing and dropping them, as we did in <a href="#dropview">3.4</a>.</p>
+<p><code>DISCARD TEMPORARY</code> frees all tempoary resources at once, including tempoary views, instead of listing and dropping them, as we did in <a href="#drop-view">3.4</a>.</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="co"># create temporary and non-temporary views</span></a>
 <a class="sourceLine" id="cb20-2" title="2">sql &lt;-<span class="st"> &quot;SELECT * FROM mtcars LIMIT 10&quot;</span></a>
 <a class="sourceLine" id="cb20-3" title="3">purrr<span class="op">::</span><span class="kw">map_lgl</span>(</a>
@@ -702,20 +706,20 @@ code span.wa { color: #da4453; } /* Warning */
 <a class="sourceLine" id="cb20-12" title="12"><span class="co">## [1] TRUE TRUE TRUE TRUE</span></a>
 <a class="sourceLine" id="cb20-13" title="13"></a>
 <a class="sourceLine" id="cb20-14" title="14">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListViews</span>()</a>
-<a class="sourceLine" id="cb20-15" title="15"><span class="co">## [1] &quot;view1&quot; &quot;view2&quot; &quot;view3&quot; &quot;view4&quot;</span></a>
+<a class="sourceLine" id="cb20-15" title="15"><span class="co">## [1] &quot;view2&quot; &quot;view3&quot; &quot;view4&quot; &quot;view1&quot;</span></a>
 <a class="sourceLine" id="cb20-16" title="16">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbDiscard</span>(<span class="dt">temporary =</span> <span class="ot">TRUE</span>) <span class="co"># delete all temporary objects</span></a>
 <a class="sourceLine" id="cb20-17" title="17">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListViews</span>() <span class="co"># non-temporary views are still alive</span></a>
 <a class="sourceLine" id="cb20-18" title="18"><span class="co">## [1] &quot;view3&quot; &quot;view4&quot;</span></a></code></pre></div>
 </div>
 </div>
-<div id="droptable" class="section level2 hasAnchor">
-<h2><span class="header-section-number">4.2</span> Drop a Table<a href="#droptable" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="drop-table" class="section level2 hasAnchor">
+<h2><span class="header-section-number">4.2</span> Drop a Table<a href="#drop-table" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div id="definition-7" class="section level3 hasAnchor">
 <h3><span class="header-section-number">4.2.1</span> Definition<a href="#definition-7" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
 <li>Drop a table, with <code>IF EXISTS</code> and <code>CASCADE</code> option.</li>
 <li>Returns the total number of views dropped, invisibly.</li>
-<li>See <a href="#dropview">3.4</a> for the usage of optional arguments.</li>
+<li>See <a href="#dropview"><strong>??</strong></a> for the usage of optional arguments.</li>
 </ul>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1">dbDropTables &lt;-<span class="st"> </span><span class="cf">function</span>(conn, name, <span class="dt">if_exists =</span> <span class="ot">FALSE</span>, <span class="dt">cascade =</span> <span class="ot">FALSE</span>) {</a>
 <a class="sourceLine" id="cb21-2" title="2">    before &lt;-<span class="st"> </span>con <span class="op">%&gt;%</span></a>
@@ -741,14 +745,14 @@ code span.wa { color: #da4453; } /* Warning */
 <a class="sourceLine" id="cb22-5" title="5">)</a>
 <a class="sourceLine" id="cb22-6" title="6"><span class="co">## [1] TRUE TRUE TRUE</span></a>
 <a class="sourceLine" id="cb22-7" title="7">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListTables</span>()</a>
-<a class="sourceLine" id="cb22-8" title="8"><span class="co">## [1] &quot;mtcars&quot; &quot;view1&quot;  &quot;view2&quot;  &quot;view3&quot;</span></a>
+<a class="sourceLine" id="cb22-8" title="8"><span class="co">## [1] &quot;mtcars&quot; &quot;view2&quot;  &quot;view3&quot;  &quot;view1&quot;</span></a>
 <a class="sourceLine" id="cb22-9" title="9"></a>
 <a class="sourceLine" id="cb22-10" title="10"><span class="co"># specifying a view causes an error</span></a>
 <a class="sourceLine" id="cb22-11" title="11">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbDropTables</span>(<span class="st">&quot;view2&quot;</span>, <span class="dt">if_exists =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb22-12" title="12"><span class="co">## Error: Failed to fetch row: ERROR:  &quot;view2&quot; is not a table</span></a>
 <a class="sourceLine" id="cb22-13" title="13"><span class="co">## HINT:  Use DROP VIEW to remove a view.</span></a>
 <a class="sourceLine" id="cb22-14" title="14">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListTables</span>()</a>
-<a class="sourceLine" id="cb22-15" title="15"><span class="co">## [1] &quot;mtcars&quot; &quot;view1&quot;  &quot;view2&quot;  &quot;view3&quot;</span></a>
+<a class="sourceLine" id="cb22-15" title="15"><span class="co">## [1] &quot;mtcars&quot; &quot;view2&quot;  &quot;view3&quot;  &quot;view1&quot;</span></a>
 <a class="sourceLine" id="cb22-16" title="16"></a>
 <a class="sourceLine" id="cb22-17" title="17"><span class="co"># specifying a referred table deletes all dependent views</span></a>
 <a class="sourceLine" id="cb22-18" title="18">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbDropTables</span>(<span class="st">&quot;mtcars&quot;</span>, <span class="dt">cascade =</span> <span class="ot">TRUE</span>)</a>

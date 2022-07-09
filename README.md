@@ -1,7 +1,7 @@
 # About
 
 This is a set of user-defined functions that DBI + RPostgres users would find useful.
-They take similar arguments to DBI functions and behave similarly. The source codes are found in [scr/def.Rmd](https://github.com/Shena4746/r-functions-on-dbi/blob/main/scr/02-def.Rmd).
+They take similar arguments to DBI functions and behave similarly. The source code is in [scr/def.Rmd](https://github.com/Shena4746/r-functions-on-dbi/blob/main/scr/02-def.Rmd).
 
 [This article](https://shena4746.github.io/r-functions-on-dbi/) provides an overview of each function, its definition code, and examples.
 
@@ -14,7 +14,7 @@ Some familiarity with DBI is assumed since they all heavily rely on it. For more
   - Disconnect connections at once
 - Views
   - Create a view
-  - List view
+  - List views
   - Test existence of a view
   - Drop a view
 - Misc

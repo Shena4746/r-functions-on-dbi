@@ -1,0 +1,683 @@
+---
+title: "User-defined functions that DBI + RPostgres users should have"
+author: "Shena"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+github-repo: 'https://github.com/Shena4746/r-functions-on-dbi'
+---
+
+```{r knit-setting-for-top, eval = TRUE, include=FALSE}
+rm(list = ls())
+gc(reset = TRUE)
+gc(reset = TRUE)
+knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE, collapse = TRUE)
+```
+
+# About
+
+[README on github](https://github.com/Shena4746/r-functions-on-dbi).
+
+test
+\@ref(create-view)
+\@ref(test-views)
+\@ref(drop-view)
+
+## Libraries 
+
+This document is based on the following libraries.
+```{r versions-of-libraries, collapse=TRUE}
+R.version.string
+packageVersion("RPostgres")
+packageVersion("DBI")
+packageVersion("dplyr")
+packageVersion("dbplyr")
+```
+
+<!--chapter:end:top.Rmd-->
+
+```{r knit-setting-for-def-views, eval = TRUE, include=FALSE}
+# eval but not show codes in this files
+knitr::opts_chunk$set(eval = TRUE, include = FALSE)
+```
+
+
+```{r libraries, message=FALSE, warning=FALSE}
+library("RPostgres")
+library("DBI")
+library("dplyr")
+library("dbplyr")
+```
+
+```{r def-issue-con}
+issue_con <- function(service_name) {
+    # assume you are using config package and Postgres
+    crd <- config::get(service_name)
+    DBI::dbConnect(
+        drv = RPostgres::Postgres(),
+        host = crd$host,
+        port = crd$port,
+        dbname = crd$dbname,
+        user = crd$user,
+        password = crd$password
+    )
+}
+```
+
+```{r def-release-con}
+release_cons <- function(search_from = ls(".GlobalEnv"), except = NULL) {
+    purrr::map_chr(
+        .x = search_from %>% base::setdiff(except),
+        .f = function(x) {
+            ret <- ""
+            if (x %>% get() %>%
+                {
+                    inherits(., "PqConnection") & length(.) == 1
+                }) {
+                ret <- tryCatch(
+                    {
+                        x %>%
+                            get() %>%
+                            DBI::dbDisconnect()
+                        return(x)
+                    },
+                    error = function(e) {
+                        msg <- paste("Invalid PqConnection class object is provided:", x)
+                        message(msg)
+                    },
+                    warning = function(e) {
+                        return("")
+                    }
+                )
+            }
+            return(ret)
+        }
+    ) %>% .[. != ""]
+}
+```
+
+```{r def-create-view-dbi}
+dbCreateView <- function(con, name, sql, or_replace = FALSE, temporary = FALSE) {
+    if (sql %>% inherits(c("character", "SQL")) %>% isFALSE()) stop("provided sql string is not of class character or SQL.")
+    con %>%
+        DBI::sqlInterpolate(
+            sql = "CREATE ?or ?tmp VIEW ?name AS ?q",
+            or = dplyr::if_else(or_replace, "OR REPLACE", "") %>% DBI::SQL(),
+            tmp = dplyr::if_else(temporary, "TEMPORARY", "") %>% DBI::SQL(),
+            name = DBI::dbQuoteIdentifier(., name),
+            q = sql %>% DBI::SQL()
+        ) %>%
+        DBI::dbExecute(con, .)
+    invisible(TRUE) %>% return()
+}
+```
+
+```{r def-create-view-lazy}
+# not included
+CreateView <- function(con, tbl, name, or_replace = FALSE, temporary = FALSE) {
+    if (tbl %>% base::inherits("tbl_lazy") %>% isFALSE()) stop("provided tbl is not of class tbl_lazy")
+    "CREATE ?or ?tmp VIEW ?name AS ?tbl_sql" %>%
+        DBI::sqlInterpolate(
+            con,
+            .,
+            or = dplyr::if_else(or_replace, "OR REPLACE", "") %>% DBI::SQL(),
+            tmp = dplyr::if_else(temporary, "TEMPORARY", "") %>% DBI::SQL(),
+            name = name %>% DBI::dbQuoteIdentifier(con, .),
+            tbl_sql = dbplyr::sql_render(tbl) %>% SQL()
+        ) %>%
+        DBI::dbExecute(con, .)
+    invisible(TRUE) %>% return()
+}
+```
+
+```{r def-list-views}
+dbListViews <- function(con, permanent = TRUE, temporary = TRUE) {
+    ret <- character()
+    # this returns all views, temporary or not
+    list_views <- function(x) {
+        x %>%
+            dbListTables() %>%
+            setdiff(
+                x %>%
+                    DBI::dbGetQuery(
+                        statement = "SELECT tablename FROM pg_tables WHERE schemaname = current_schema()"
+                    ) %>% pull(1)
+            )
+    }
+    # retruns only non-temporary views
+    parm_views <- function(x) {
+        x %>%
+            dbGetQuery(
+                statement = "SELECT viewname FROM pg_views WHERE schemaname = current_schema()"
+            ) %>%
+            pull(1)
+    }
+    # we can't use dplyr::case_when here, which requires the returned values be the same type and the same length.
+    if (permanent & temporary) {
+        ret <- con %>% list_views()
+    } else if (permanent) {
+        ret <- con %>% parm_views()
+    } else if (temporary) {
+        ret <- con %>%
+            list_views() %>%
+            setdiff(con %>% parm_views())
+    }
+    ret %>% return()
+}
+```
+
+```{r def-exists-view}
+dbExistsViews <- function(con, names, permanent = TRUE, temporary = TRUE) {
+    names %in% dbListViews(con, permanent, temporary)
+}
+```
+
+```{r def-drop-view}
+dbDropView <- function(con, name, if_exists = FALSE, cascade = FALSE) {
+    before <- con %>%
+        dbListViews() %>%
+        length()
+    con %>%
+        DBI::sqlInterpolate(
+            sql = "DROP VIEW ?if_ex ?name ?cas_res",
+            if_ex = dplyr::if_else(if_exists, "IF EXISTS", "") %>% DBI::SQL(),
+            name = DBI::dbQuoteIdentifier(con, name),
+            cas_res = dplyr::if_else(cascade, "CASCADE", "RESTRICT") %>% SQL()
+        ) %>%
+        DBI::dbExecute(con, .)
+    before - (con %>% dbListViews() %>% length()) %>% invisible()
+}
+```
+
+```{r def-drop-table}
+dbDropTables <- function(conn, name, if_exists = FALSE, cascade = FALSE) {
+    before <- con %>%
+        dbListTables() %>%
+        length()
+    con %>%
+        DBI::sqlInterpolate(
+            sql = "DROP TABLE ?if_ex ?name ?cas_res",
+            if_ex = dplyr::if_else(if_exists, "IF EXISTS", "") %>% DBI::SQL(),
+            name = DBI::dbQuoteIdentifier(con, name),
+            cas_res = dplyr::if_else(cascade, "CASCADE", "RESTRICT") %>% SQL()
+        ) %>%
+        DBI::dbExecute(con, .)
+    before - (con %>% dbListTables() %>% length()) %>% invisible()
+}
+```
+
+```{r def-discard-function}
+dbDiscard <- function(con, all = FALSE, plans = FALSE, temporary = TRUE) {
+    if (c(all, plans, temporary) %>% any()) {
+        resource <- case_when(
+            all ~ "ALL",
+            plans ~ "PLANS",
+            temporary ~ "TEMPORARY"
+        )
+        "DISCARD ?rsc" %>%
+            DBI::sqlInterpolate(
+                con,
+                .,
+                rsc = resource %>% DBI::SQL()
+            ) %>%
+            DBI::dbExecute(con, .)
+    }
+    invisible(TRUE) %>% return()
+}
+```
+
+<!--chapter:end:01-def.Rmd-->
+
+# Connections
+
+```{r knit-setting-for-con, eval = TRUE, include=FALSE}
+
+knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE, collapse = TRUE)
+```
+
+## Issue a connection variable {#issue-con}
+
+- Retruns a new `DBIConnection` object used to communicate with a database.
+- It is recommended that you make sure you have disconnected old connections before using this.
+
+### Definition
+
+
+```{r issue-con-show, ref.label='def-issue-con', eval=FALSE}
+```
+
+### Example
+
+Before setting a new connection variable, make sure that you are not trying to issue more connection variables than you need or overwrite exsisting one without disconnect it. So it is a good practice to disconnect before connecting, for instance, using `release_cons` defined below.
+
+```{r issue-con-example}
+release_cons() # Don't forget!
+con <- issue_con("demo")
+con %>% print()
+```
+
+## Disconnect connections {#release-cons}
+
+### Definition
+
+- Disconnects all connection variables whose names are included in the passed vector of strings.
+- Retruns a vector of characters listing connection variables that are disconnected by the function call.
+- The arguments `search_from = ` specifies a vector of strings that might contain connection variables to be disconnected. The default is set to a vector of names of all objects in the global namespace.
+- The arguments `except = NULL` specifies a vector of strings that should be excluded from `search_from` argument.  
+
+```{r ref.label='def-release-con', eval=FALSE}
+```
+
+### Example
+
+```{r release-cons-example, warning=TRUE}
+release_cons() %>% invisible()
+
+con1 <- issue_con("demo")
+con2 <- issue_con("demo")
+cons <- release_cons()
+
+cons %>% print()
+
+# check that they are actually disconnected
+purrr::map_lgl(cons, ~ dbDisconnect(.x %>% get()))
+
+# disconnect all connetions but 'con'
+con <- issue_con("demo")
+con1 <- issue_con("demo")
+con2 <- issue_con("demo")
+release_cons(except = "con")
+con %>% print() # con is still valid
+```
+
+
+<!--chapter:end:02-con.Rmd-->
+
+# Views
+
+```{r knit-setting-for-views, eval = TRUE, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE, collapse = TRUE)
+```
+
+```{r function-drop-all-views, include=FALSE}
+drop_all_views <- function(con) {
+    con %>%
+        dbListViews() %>%
+        purrr::map_int(~ dbDropView(con, .x, cascade = TRUE, if_exists = TRUE)) %>%
+        sum()
+}
+```
+
+```{r function-drop-all-tables, include=FALSE}
+drop_all_tables <- function(conn, names.except = NULL, if_exists = TRUE, cascade = TRUE) {
+    if (names.except %>% inherits(c("character", "NULL")) %>% isFALSE()) {
+        stop("proviede names.except must be of character-like class.")
+    }
+    con %>%
+        DBI::dbListTables() %>%
+        base::setdiff(con %>% dbListViews()) %>%
+        base::setdiff(names.except) %>%
+        purrr::map_int(~ dbDropTables(con, .x, if_exists, cascade)) %>%
+        invisible()
+}
+```
+
+```{r execute-drop-all-views, eval=FALSE, include=FALSE}
+con %>% drop_all_views()
+```
+
+```{r execute-clear-all-tables, include=FALSE}
+# clear views and table, if any
+con %>% drop_all_tables()
+```
+
+This section asssumes that `mtcars` table has been created in a remote table.
+
+```{r prepare-mtcars-table}
+if (con %>% dbExistsTable("mtcars") %>% isFALSE()) {
+    con %>% dbWriteTable("mtcars", mtcars)
+}
+
+con %>%
+    dbReadTable("mtcars") %>%
+    head()
+```
+
+## Create a view {#create-view}
+
+- Creates a view from the passed SQL query.
+- Returns `TRUE` invisibly.
+- `temporary = FALSE` and `or_replace = FALSE` arguments specify whether to enable `TEMPORARY` and `OR REPLACE` options, respectively. 
+
+### Definition
+
+```{r def-create-view-dbi-show, ref.label='def-create-view-dbi', eval=FALSE}
+```
+
+Since `DBI::dbExecute` does not accept multiple statements, `dbCreateView` is not subject to SQL injection of that form.
+
+### Example
+
+```{r create-view-actually-creates-view-example}
+if (con %>% dbExistsTable("cars") %>% isFALSE()) con %>% dbWriteTable("cars", cars)
+
+con %>% dbCreateView(
+    name = "view_cars_20",
+    sql = "SELECT * FROM cars WHERE dist < 20"
+)
+con %>% dbReadTable("view_cars_20")
+
+# see the view properly follow the change in the referred table
+con %>% dbAppendTable("cars", data.frame(speed = 7, dist = 19))
+con %>% dbReadTable("view_cars_20")
+```
+
+```{r, include=FALSE}
+con %>% drop_all_tables(names.except = "mtcars")
+```
+
+temporary views vanish when temporary resources are freed, which happenes, for instance, when `dbDisconnect()` is executed. 
+
+```{r create-temp-view-example}
+sql <- "SELECT * FROM mtcars"
+con %>% dbCreateView("view_permanent", sql)
+con %>% dbCreateView("view_temporary", sql, temporary = TRUE)
+con %>% dbListTables()
+# reconnect
+con %>% dbDisconnect()
+con <- issue_con("demo")
+# temporary table has vanished
+con %>% dbListTables()
+```
+
+```{r ref.label='execute-drop-all-views', include=FALSE}
+```
+
+Given a set of `SELECT` queries and names that should be complied as views, you can create those views at once.
+
+```{r create-many-views-at-once}
+cyls <- c(4, 6, 8)
+names <- purrr::map(cyls, ~ paste("view_cyl=", .x, sep = ""))
+sqls <- purrr::map(cyls, ~ sqlInterpolate(
+    con,
+    "SELECT * FROM mtcars WHERE cyl = ?cyl",
+    cyl = .x
+))
+# vectorised view creation
+purrr::map2_lgl(names, sqls, ~ dbCreateView(con, .x, .y))
+con %>% dbListTables()
+```
+
+```{r ref.label='execute-drop-all-views', include=FALSE}
+```
+
+The combination of `dbCreateView()` and the dbplyr package allows you to create views without writing any SQL statements. This is often much quicker than working with SQL.
+
+```{r create-views-lazy}
+if (con %>% dbExistsTable("flights") %>% isFALSE()) con %>% dbWriteTable("flights", nycflights13::flights)
+
+# work on lazy table
+# get all rows with no missing values
+flights_no_NA <- tbl(con, "flights") %>%
+    filter(if_all(everything(), ~ !is.na(.)))
+flights_no_NA %>% class()
+flights_no_NA %>% summarise(n())
+
+# number of NA on each columns
+flights_no_NA %>% summarise(
+    across(
+        .cols = everything(),
+        .fns = ~ if_else(is.na(.x), 1, 0) %>% sum(),
+        .names = "{.col}_NA"
+    )
+)
+
+# transform it into a view
+con %>% dbCreateView(
+    name = "flights_no_NA",
+    sql = flights_no_NA %>% dbplyr::sql_render()
+)
+
+con %>% dbListTables()
+flights_view <- con %>% tbl("flights_no_NA")
+flights_no_NA %>% summarise(n())
+flights_view %>% head()
+```
+
+```{r ref.label='execute-drop-all-views', include=FALSE}
+```
+
+```{r remove-flights, include=FALSE}
+con %>% drop_all_tables(names.except = "mtcars")
+```
+
+## List views {#list-views}
+
+- Lists all view names, including temporary ones.
+- Returns a vector of strings representing view names.
+- The arguments `permanent = TRUE` and `temporary = TRUE` specify whether to include non-temporal and temporary views, respectively. An empty character will be returned if both are set to `FALSE`.
+
+### Definition
+```{r def-list-views-show, ref.label='def-list-views'}
+```
+
+### Example
+
+```{r list-view-example}
+N <- 3
+sql <- "SELECT * FROM mtcars"
+names <- purrr::map(1:N, ~ paste("view_", .x, sep = ""))
+names_tmp <- purrr::map(1:N, ~ paste("view_temp_", .x, sep = ""))
+# non-temporary views
+purrr::map_lgl(names, ~ dbCreateView(con, .x, sql))
+# temporary views
+purrr::map_lgl(names_tmp, ~ dbCreateView(con, .x, sql, temporary = TRUE))
+
+# show temoporary views
+con %>% dbListViews(permanent = FALSE)
+# show non-temoporary views
+con %>% dbListViews(temporary = FALSE)
+```
+
+```{r ref.label='execute-drop-all-views', include=FALSE}
+```
+
+## Test existence of views {#test-views}
+
+- Test the existence of views.
+- Returns a logical vector of the same length as the input.
+- Accpepts the same arguments as `dbCreateView`.
+
+### Definition
+
+```{r def-exists-view-show, ref.label='def-exists-view'}
+```
+
+### Example
+
+```{r test-views-example}
+sql <- "SELECT * FROM mtcars"
+purrr::map2_lgl(
+    .x = c("view", "view_temp"),
+    .y = c(FALSE, TRUE),
+    .f = ~ dbCreateView(con, .x, sql, temporary = .y)
+)
+
+viewnames <- c("view", "view_temp", "view_absent")
+con %>% dbExistsViews(viewnames)
+con %>% dbExistsViews(viewnames, permanent = FALSE)
+con %>% dbExistsViews(viewnames, temporary = FALSE)
+```
+
+```{r ref.label='execute-drop-all-views', include=FALSE}
+```
+
+## Drop a view {#drop-view}
+
+- Drops a view.
+- Returns the total number of views dropped, invisibly.
+- The arguments `if_exists = FALSE` and `cascade = FALSE` specify whether to enable the corresponding SQL options. If `cascade = FALSE`, the default, then `RESTRICT` option is set.
+
+### Definition
+
+```{r def-drop-view-show, ref.label='def-drop-view'}
+```
+
+### Example
+
+View can be dropped in a vectorised way. If you are dropping temporary views only, then you can also use the `DISCARD` statement \@ref(discard).
+
+```{r drop-all-temporary-views-example}
+# create views to demonstrate a vectorised removal
+sql <- "SELECT * FROM mtcars LIMIT 10"
+names <- purrr::map(1:4, ~ paste("view", .x, sep = ""))
+tmps <- purrr::map(1:4, ~ .x <= 2)
+purrr::map2_lgl(names, tmps, ~ dbCreateView(con, .x, sql, temporary = .y)) %>% invisible() # discard output
+
+con %>% dbListViews()
+
+# drop only temporary views
+con %>%
+    dbListViews(temporary = TRUE, permanent = FALSE) %>%
+    purrr::map_int(~ dbDropView(con, .x)) %>%
+    sum() # total number of tables dropped
+
+con %>% dbListViews() # non-temporary views are still alive
+
+# drop them
+con %>%
+    dbListViews(temporary = FALSE, permanent = TRUE) %>%
+    purrr::map_int(~ dbDropView(con, .x)) %>%
+    sum()
+
+con %>% dbListViews()
+```
+
+Dependent views could be a source of an error during this vectorised removal. Set `if_exists = TRUE` whenever `cascade = TRUE` to avoid this problem.
+
+```{r drop-view-example-cascading, error=TRUE}
+con %>% dbCreateView(
+    name = "view_super",
+    sql = "SELECT * FROM mtcars LIMIT 10"
+)
+con %>% dbCreateView(
+    name = "view_sub",
+    sql = "SELECT * FROM view_super LIMIT 10"
+)
+
+# set `if_exists = TRUE` to skip an cascade-dropped view
+c("view_super", "view_sub") %>%
+    purrr::map(~ dbDropView(con, .x, cascade = TRUE))
+```
+
+
+<!--chapter:end:03-views.Rmd-->
+
+```{r knit-setting-for-misc, eval = TRUE, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE, collapse = TRUE)
+```
+
+# Misc
+
+## Free Resources {#discard}
+
+- Executes a `DISCARD` SQL statement.
+- Returns `TRUE` invisibly even if it does nothing.
+- The arguments `all = FALSE`, `plans = FALSE` and `temporary = TRUE` specify which of the corresponding SQL statement option should be applied. If multiple options are selected, only the most dominant one will be executed. If none is selected, nothing will be done.
+
+### Definition
+
+```{r def-discard-function-show, ref.label='def-discard-function'}
+```
+
+### Example
+
+`DISCARD TEMPORARY` frees all tempoary resources at once, including tempoary views, instead of listing and dropping them, as we did in \@ref(drop-view).
+
+```{r discard-temprary-view}
+# create temporary and non-temporary views
+sql <- "SELECT * FROM mtcars LIMIT 10"
+purrr::map_lgl(
+    .x = 1:4,
+    ~ dbCreateView(
+        con,
+        name = paste("view", .x, sep = ""),
+        sql = sql,
+        temporary = isTRUE(.x <= 2)
+    )
+)
+
+con %>% dbListViews()
+con %>% dbDiscard(temporary = TRUE) # delete all temporary objects
+con %>% dbListViews() # non-temporary views are still alive
+```
+
+```{r ref.label='execute-drop-all-views', include=FALSE}
+```
+
+## Drop a Table {#drop-table}
+
+### Definition
+
+- Drop a table, with `IF EXISTS` and `CASCADE` option.
+- Returns the total number of views dropped, invisibly.
+- See \@ref(dropview) for the usage of optional arguments.
+
+```{r ref.label='def-drop-table', eval=FALSE}
+```
+
+### Example
+
+```{r, drop-tables-example, error=TRUE}
+sql <- "SELECT * FROM mtcars"
+purrr::map_lgl(
+    .x = 1:3,
+    .f = ~ dbCreateView(con, name = paste0("view", .x), sql)
+)
+con %>% dbListTables()
+
+# specifying a view causes an error
+con %>% dbDropTables("view2", if_exists = TRUE)
+con %>% dbListTables()
+
+# specifying a referred table deletes all dependent views
+con %>% dbDropTables("mtcars", cascade = TRUE)
+con %>% dbListTables()
+```
+
+```{r ref.label='execute-clear-all-tables', include=FALSE}
+```
+```{r exit-disconnect,include=FALSE}
+con %>% dbDisconnect()
+```
+
+<!--chapter:end:04-misc.Rmd-->
+
+```{r knit-setting-for-ref, eval = TRUE, include=FALSE}
+rm(list = ls())
+gc(reset = TRUE)
+gc(reset = TRUE)
+knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE, collapse = TRUE)
+```
+
+# References: dbplyr, DBI, RPostgres {#references}
+
+Introduction
+
+- [巨大なデータがSQLサーバーにあるときに、Rでどう立ち向かうかマニュアル：dbplyrパッケージを中心として](https://yutatoyama.github.io/note/intro_R_for_SQL.html)
+- [Introduction to dbplyr](https://dbplyr.tidyverse.org/articles/dbplyr.html)
+- [R: Working with Databases](https://nuitrcs.github.io/databases_workshop/r/r_databases.html)
+- [Introduction to DBI](https://dbi.r-dbi.org/articles/dbi)
+
+DBI
+
+- [RSQLite & DBIの使い方](http://delta0726.web.fc2.com/packages/database/00_RSQLite.html)
+- [DBI specification](https://dbi.r-dbi.org/articles/spec)
+- [DBI: R Database Interface .pdf](https://cran.r-project.org/web/packages/DBI/DBI.pdf)
+- [Code Examples for DBI and RPostgres](https://shena4746.github.io/code-examples-dbi-rpostgres/)
+
+RPostgres
+
+- [RPostgres - Reference](https://rpostgres.r-dbi.org/reference/index.html)
+
+<!--chapter:end:05-ref.Rmd-->
+

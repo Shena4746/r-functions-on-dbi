@@ -17,7 +17,7 @@ knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE,
 
 ### Example
 
-`DISCARD TEMPORARY` frees all tempoary resources at once, including tempoary views, instead of listing and dropping them, as we did in \@ref(dropview).
+`DISCARD TEMPORARY` frees all tempoary resources at once, including tempoary views, instead of listing and dropping them, as we did in \@ref(drop-view).
 
 ```{r discard-temprary-view}
 # create temporary and non-temporary views
@@ -40,7 +40,7 @@ con %>% dbListViews() # non-temporary views are still alive
 ```{r ref.label='execute-drop-all-views', include=FALSE}
 ```
 
-## Drop a Table {#droptable}
+## Drop a Table {#drop-table}
 
 ### Definition
 
