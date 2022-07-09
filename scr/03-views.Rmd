@@ -1,4 +1,4 @@
-# Functions for Views
+# Views
 
 ```{r knit-setting-for-views, eval = TRUE, include=FALSE}
 knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE, collapse = TRUE)
@@ -36,7 +36,7 @@ con %>% drop_all_views()
 con %>% drop_all_tables()
 ```
 
-table example
+This section asssumes that `mtcars` table has been created in a remote table.
 
 ```{r prepare-mtcars-table}
 if (con %>% dbExistsTable("mtcars") %>% isFALSE()) {
@@ -81,7 +81,7 @@ con %>% dbReadTable("view_cars_20")
 con %>% drop_all_tables(names.except = "mtcars")
 ```
 
-Tempoary views vanish when temporary resources are freed, which happenes, for instance, when `dbDisconnect()` is executed. 
+temporary views vanish when temporary resources are freed, which happenes, for instance, when `dbDisconnect()` is executed. 
 
 ```{r create-temp-view-example}
 sql <- "SELECT * FROM mtcars"
@@ -91,7 +91,7 @@ con %>% dbListTables()
 # reconnect
 con %>% dbDisconnect()
 con <- issue_con("demo")
-# temprary table has vanished
+# temporary table has vanished
 con %>% dbListTables()
 ```
 
@@ -113,21 +113,40 @@ purrr::map2_lgl(names, sqls, ~ dbCreateView(con, .x, .y))
 con %>% dbListTables()
 ```
 
+```{r ref.label='execute-drop-all-views', include=FALSE}
+```
+
 The combination of `dbCreateView()` and the dbplyr package allows you to create views without writing any SQL statements. This is often much quicker than working with SQL.
 
 ```{r create-views-lazy}
 if (con %>% dbExistsTable("flights") %>% isFALSE()) con %>% dbWriteTable("flights", nycflights13::flights)
 
+# work on lazy table
 # get all rows with no missing values
 flights_no_NA <- tbl(con, "flights") %>%
     filter(if_all(everything(), ~ !is.na(.)))
 flights_no_NA %>% class()
+flights_no_NA %>% summarise(n())
 
+# number of NA on each columns
+flights_no_NA %>% summarise(
+    across(
+        .cols = everything(),
+        .fns = ~ if_else(is.na(.x), 1, 0) %>% sum(),
+        .names = "{.col}_NA"
+    )
+)
+
+# transform it into a view
 con %>% dbCreateView(
     name = "flights_no_NA",
     sql = flights_no_NA %>% dbplyr::sql_render()
 )
-con %>% tbl("flights_no_NA")
+
+con %>% dbListTables()
+flights_view <- con %>% tbl("flights_no_NA")
+flights_no_NA %>% summarise(n())
+flights_view %>% head()
 ```
 
 ```{r ref.label='execute-drop-all-views', include=FALSE}
@@ -139,9 +158,9 @@ con %>% drop_all_tables(names.except = "mtcars")
 
 ## List views
 
-- Lists all view names, including tempoary ones.
-- Returns a vector of strings represeting view names.
-- The arguments `permanent = TRUE` and `temporary = TRUE` specify whether to include non-temporal and tempoary views, respectively. An empty character will be returned if both are set to `FALSE`.
+- Lists all view names, including temporary ones.
+- Returns a vector of strings representing view names.
+- The arguments `permanent = TRUE` and `temporary = TRUE` specify whether to include non-temporal and temporary views, respectively. An empty character will be returned if both are set to `FALSE`.
 
 ### Definition
 ```{r def-list-views-show, ref.label='def-list-views'}
@@ -211,7 +230,7 @@ con %>% dbExistsViews(viewnames, temporary = FALSE)
 
 ### Example
 
-View can be dropped in a vectorised way. If you are dropping temprary views only, then you can also use the `DISCARD` statement \@ref(discard).
+View can be dropped in a vectorised way. If you are dropping temporary views only, then you can also use the `DISCARD` statement \@ref(discard).
 
 ```{r drop-all-temporary-views-example}
 # create views to demonstrate a vectorised removal

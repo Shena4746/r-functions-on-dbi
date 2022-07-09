@@ -1,0 +1,62 @@
+# Connections
+
+```{r knit-setting-for-con, eval = TRUE, include=FALSE}
+
+knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE, collapse = TRUE)
+```
+
+## Issue a Connection variable 
+
+- Retruns a new `DBIConnection` object used to communicate with a database.
+- It is recommended that you make sure you have disconnected old connections before using this.
+
+### Definition
+
+
+```{r issue-con-show, ref.label='def-issue-con', eval=FALSE}
+```
+
+### Example
+
+Before setting a new connection variable, make sure that you are not trying to issue more connection variables than you need or overwrite exsisting one without disconnect it. So it is a good practice to disconnect before connecting, for instance, using `release_cons` defined below.
+
+```{r issue-con-example}
+release_cons() # Don't forget!
+con <- issue_con("demo")
+con %>% print()
+```
+
+## Disconnect Connections {#release_cons}
+
+### Definition
+
+- Disconnects all connection variables whose names are included in the passed vector of strings.
+- Retruns a vector of characters listing connection variables that are disconnected by the function call.
+- The arguments `search_from = ` specifies a vector of strings that might contain connection variables to be disconnected. The default is set to a vector of names of all objects in the global namespace.
+- The arguments `except = NULL` specifies a vector of strings that should be excluded from `search_from` argument.  
+
+```{r ref.label='def-release-con', eval=FALSE}
+```
+
+### Example
+
+```{r release-cons-example, warning=TRUE}
+release_cons() %>% invisible()
+
+con1 <- issue_con("demo")
+con2 <- issue_con("demo")
+cons <- release_cons()
+
+cons %>% print()
+
+# check that they are actually disconnected
+purrr::map_lgl(cons, ~ dbDisconnect(.x %>% get()))
+
+# disconnect all connetions but 'con'
+con <- issue_con("demo")
+con1 <- issue_con("demo")
+con2 <- issue_con("demo")
+release_cons(except = "con")
+con %>% print() # con is still valid
+```
+

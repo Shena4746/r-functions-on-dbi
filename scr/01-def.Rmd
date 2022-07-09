@@ -3,6 +3,61 @@
 knitr::opts_chunk$set(eval = TRUE, include = FALSE)
 ```
 
+
+```{r libraries, message=FALSE, warning=FALSE}
+library("RPostgres")
+library("DBI")
+library("dplyr")
+library("dbplyr")
+```
+
+```{r def-issue-con}
+issue_con <- function(service_name) {
+    # assume you are using config package and Postgres
+    crd <- config::get(service_name)
+    DBI::dbConnect(
+        drv = RPostgres::Postgres(),
+        host = crd$host,
+        port = crd$port,
+        dbname = crd$dbname,
+        user = crd$user,
+        password = crd$password
+    )
+}
+```
+
+```{r def-release-con}
+release_cons <- function(search_from = ls(".GlobalEnv"), except = NULL) {
+    purrr::map_chr(
+        .x = search_from %>% base::setdiff(except),
+        .f = function(x) {
+            ret <- ""
+            if (x %>% get() %>%
+                {
+                    inherits(., "PqConnection") & length(.) == 1
+                }) {
+                ret <- tryCatch(
+                    {
+                        x %>%
+                            get() %>%
+                            DBI::dbDisconnect()
+                        return(x)
+                    },
+                    error = function(e) {
+                        msg <- paste("Invalid PqConnection class object is provided:", x)
+                        message(msg)
+                    },
+                    warning = function(e) {
+                        return("")
+                    }
+                )
+            }
+            return(ret)
+        }
+    ) %>% .[. != ""]
+}
+```
+
 ```{r def-create-view-dbi}
 dbCreateView <- function(con, name, sql, or_replace = FALSE, temporary = FALSE) {
     if (sql %>% inherits(c("character", "SQL")) %>% isFALSE()) stop("provided sql string is not of class character or SQL.")
@@ -110,38 +165,6 @@ dbDropTables <- function(conn, name, if_exists = FALSE, cascade = FALSE) {
         ) %>%
         DBI::dbExecute(con, .)
     before - (con %>% dbListTables() %>% length()) %>% invisible()
-}
-```
-
-```{r def-release-con}
-release_cons <- function(search_from = ls(".GlobalEnv")) {
-    purrr::map_chr(
-        .x = search_from,
-        .f = function(x) {
-            ret <- ""
-            if (x %>% get() %>%
-                {
-                    inherits(., "PqConnection") & length(.) == 1
-                }) {
-                ret <- tryCatch(
-                    {
-                        x %>%
-                            get() %>%
-                            DBI::dbDisconnect()
-                        return(x)
-                    },
-                    error = function(e) {
-                        msg <- paste("Invalid PqConnection class object is provided:", x)
-                        message(msg)
-                    },
-                    warning = function(e) {
-                        return("")
-                    }
-                )
-            }
-            return(ret)
-        }
-    ) %>% .[. != ""]
 }
 ```
 

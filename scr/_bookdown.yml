@@ -1,8 +1,10 @@
 book_filename: index.Rmd
-delete_merged_file: true
+delete_merged_file: false
+
 rmd_files: 
   - top.Rmd # bind Rmd in this order.
-  - 01-setup.Rmd 
-  - 02-def.Rmd 
+  - 01-def.Rmd 
+  - 02-con.Rmd 
   - 03-views.Rmd
   - 04-misc.Rmd
+  - 05-ref.Rmd

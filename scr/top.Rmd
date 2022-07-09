@@ -1,32 +1,25 @@
 ---
-title: "Supplementary functions for DBI + RPostgres"
+title: "User-defined functions that DBI + RPostgres users should have"
 author: "Shena"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 github-repo: 'https://github.com/Shena4746/r-functions-on-dbi'
 ---
 
-# About
-
-say something
-
 ```{r knit-setting-for-top, eval = TRUE, include=FALSE}
 rm(list = ls())
 gc(reset = TRUE)
 gc(reset = TRUE)
-knitr::opts_chunk$set(eval = TRUE, include = FALSE, echo = TRUE, warning = FALSE, collapse = TRUE)
+knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE, collapse = TRUE)
 ```
+
+# About
+
+[README on github](https://github.com/Shena4746/r-functions-on-dbi).
 
 ## Libraries 
 
-```{r libraries, message=FALSE, warning=FALSE}
-library("RPostgres")
-library("DBI")
-library("dplyr")
-library("dbplyr")
-```
-
-This document is based on the following libraries and versions.
+This document is based on the following libraries.
 ```{r versions-of-libraries, collapse=TRUE}
 R.version.string
 packageVersion("RPostgres")

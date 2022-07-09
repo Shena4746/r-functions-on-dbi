@@ -1,0 +1,26 @@
+```{r knit-setting-for-ref, eval = TRUE, include=FALSE}
+rm(list = ls())
+gc(reset = TRUE)
+gc(reset = TRUE)
+knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE, collapse = TRUE)
+```
+
+# References: dbplyr, DBI, RPostgres {#references}
+
+Introduction
+
+- [巨大なデータがSQLサーバーにあるときに、Rでどう立ち向かうかマニュアル：dbplyrパッケージを中心として](https://yutatoyama.github.io/note/intro_R_for_SQL.html)
+- [Introduction to dbplyr](https://dbplyr.tidyverse.org/articles/dbplyr.html)
+- [R: Working with Databases](https://nuitrcs.github.io/databases_workshop/r/r_databases.html)
+- [Introduction to DBI](https://dbi.r-dbi.org/articles/dbi)
+
+DBI
+
+- [RSQLite & DBIの使い方](http://delta0726.web.fc2.com/packages/database/00_RSQLite.html)
+- [DBI specification](https://dbi.r-dbi.org/articles/spec)
+- [DBI: R Database Interface .pdf](https://cran.r-project.org/web/packages/DBI/DBI.pdf)
+- [Code Examples for DBI and RPostgres](https://shena4746.github.io/code-examples-dbi-rpostgres/)
+
+RPostgres
+
+- [RPostgres - Reference](https://rpostgres.r-dbi.org/reference/index.html)
