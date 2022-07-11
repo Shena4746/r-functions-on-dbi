@@ -23,7 +23,7 @@
 <meta name="author" content="Shena" />
 
 
-<meta name="date" content="2022-07-10" />
+<meta name="date" content="2022-07-11" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -196,18 +196,14 @@ code span.wa { color: #da4453; } /* Warning */
 <div id="header">
 <h1 class="title">User-defined functions that DBI + RPostgres users should have</h1>
 <p class="author"><em>Shena</em></p>
-<p class="date"><em>2022-07-10</em></p>
+<p class="date"><em>2022-07-11</em></p>
 </div>
 <div id="about" class="section level1 hasAnchor">
 <h1><span class="header-section-number">1</span> About<a href="#about" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><a href="https://github.com/Shena4746/r-functions-on-dbi">README on github</a>.</p>
-<p>test
-<a href="#create-view">3.1</a>
-<a href="#test-views">3.3</a>
-<a href="#drop-view">3.4</a></p>
 <div id="libraries" class="section level2 hasAnchor">
 <h2><span class="header-section-number">1.1</span> Libraries<a href="#libraries" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>This document is based on the following libraries.</p>
+<p>This document relies on the following libraries.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">R.version.string</a>
 <a class="sourceLine" id="cb1-2" title="2"><span class="co">## [1] &quot;R version 4.2.0 (2022-04-22)&quot;</span></a>
 <a class="sourceLine" id="cb1-3" title="3"><span class="kw">packageVersion</span>(<span class="st">&quot;RPostgres&quot;</span>)</a>
@@ -620,7 +616,7 @@ code span.wa { color: #da4453; } /* Warning */
 <a class="sourceLine" id="cb17-5" title="5">purrr<span class="op">::</span><span class="kw">map2_lgl</span>(names, tmps, <span class="op">~</span><span class="st"> </span><span class="kw">dbCreateView</span>(con, .x, sql, <span class="dt">temporary =</span> .y)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">invisible</span>() <span class="co"># discard output</span></a>
 <a class="sourceLine" id="cb17-6" title="6"></a>
 <a class="sourceLine" id="cb17-7" title="7">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListViews</span>()</a>
-<a class="sourceLine" id="cb17-8" title="8"><span class="co">## [1] &quot;view1&quot; &quot;view2&quot; &quot;view3&quot; &quot;view4&quot;</span></a>
+<a class="sourceLine" id="cb17-8" title="8"><span class="co">## [1] &quot;view2&quot; &quot;view3&quot; &quot;view4&quot; &quot;view1&quot;</span></a>
 <a class="sourceLine" id="cb17-9" title="9"></a>
 <a class="sourceLine" id="cb17-10" title="10"><span class="co"># drop only temporary views</span></a>
 <a class="sourceLine" id="cb17-11" title="11">con <span class="op">%&gt;%</span></a>
@@ -706,7 +702,7 @@ code span.wa { color: #da4453; } /* Warning */
 <a class="sourceLine" id="cb20-12" title="12"><span class="co">## [1] TRUE TRUE TRUE TRUE</span></a>
 <a class="sourceLine" id="cb20-13" title="13"></a>
 <a class="sourceLine" id="cb20-14" title="14">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListViews</span>()</a>
-<a class="sourceLine" id="cb20-15" title="15"><span class="co">## [1] &quot;view2&quot; &quot;view3&quot; &quot;view4&quot; &quot;view1&quot;</span></a>
+<a class="sourceLine" id="cb20-15" title="15"><span class="co">## [1] &quot;view1&quot; &quot;view2&quot; &quot;view3&quot; &quot;view4&quot;</span></a>
 <a class="sourceLine" id="cb20-16" title="16">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbDiscard</span>(<span class="dt">temporary =</span> <span class="ot">TRUE</span>) <span class="co"># delete all temporary objects</span></a>
 <a class="sourceLine" id="cb20-17" title="17">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListViews</span>() <span class="co"># non-temporary views are still alive</span></a>
 <a class="sourceLine" id="cb20-18" title="18"><span class="co">## [1] &quot;view3&quot; &quot;view4&quot;</span></a></code></pre></div>
@@ -745,14 +741,14 @@ code span.wa { color: #da4453; } /* Warning */
 <a class="sourceLine" id="cb22-5" title="5">)</a>
 <a class="sourceLine" id="cb22-6" title="6"><span class="co">## [1] TRUE TRUE TRUE</span></a>
 <a class="sourceLine" id="cb22-7" title="7">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListTables</span>()</a>
-<a class="sourceLine" id="cb22-8" title="8"><span class="co">## [1] &quot;mtcars&quot; &quot;view2&quot;  &quot;view3&quot;  &quot;view1&quot;</span></a>
+<a class="sourceLine" id="cb22-8" title="8"><span class="co">## [1] &quot;mtcars&quot; &quot;view1&quot;  &quot;view2&quot;  &quot;view3&quot;</span></a>
 <a class="sourceLine" id="cb22-9" title="9"></a>
 <a class="sourceLine" id="cb22-10" title="10"><span class="co"># specifying a view causes an error</span></a>
 <a class="sourceLine" id="cb22-11" title="11">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbDropTables</span>(<span class="st">&quot;view2&quot;</span>, <span class="dt">if_exists =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb22-12" title="12"><span class="co">## Error: Failed to fetch row: ERROR:  &quot;view2&quot; is not a table</span></a>
 <a class="sourceLine" id="cb22-13" title="13"><span class="co">## HINT:  Use DROP VIEW to remove a view.</span></a>
 <a class="sourceLine" id="cb22-14" title="14">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbListTables</span>()</a>
-<a class="sourceLine" id="cb22-15" title="15"><span class="co">## [1] &quot;mtcars&quot; &quot;view2&quot;  &quot;view3&quot;  &quot;view1&quot;</span></a>
+<a class="sourceLine" id="cb22-15" title="15"><span class="co">## [1] &quot;mtcars&quot; &quot;view1&quot;  &quot;view2&quot;  &quot;view3&quot;</span></a>
 <a class="sourceLine" id="cb22-16" title="16"></a>
 <a class="sourceLine" id="cb22-17" title="17"><span class="co"># specifying a referred table deletes all dependent views</span></a>
 <a class="sourceLine" id="cb22-18" title="18">con <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dbDropTables</span>(<span class="st">&quot;mtcars&quot;</span>, <span class="dt">cascade =</span> <span class="ot">TRUE</span>)</a>

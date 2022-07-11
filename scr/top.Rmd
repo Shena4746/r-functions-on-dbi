@@ -19,7 +19,7 @@ knitr::opts_chunk$set(eval = TRUE, include = TRUE, echo = TRUE, warning = FALSE,
 
 ## Libraries 
 
-This document is based on the following libraries.
+This document relies on the following libraries.
 ```{r versions-of-libraries, collapse=TRUE}
 R.version.string
 packageVersion("RPostgres")
